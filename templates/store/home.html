@@ -24,10 +24,22 @@
                             <div class="d-flex flex-row align-items-center">
                                 <h4 class="mr-1">${{ product.price }}</h4><span class="strike-text">$20.99</span>
                             </div>
-                            <input type="number" min="1" style="width: 70px;" value="1">
+                            <div class="col-6">
+                                <label for="select">Qty</label>
+                                <select id="select-qty">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+
+                            </div>
                             <div class="d-flex flex-column mt-4">
-                                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-primary btn-sm" type="button" >Details</a>
-                                <button class="btn btn-outline-primary btn-sm mt-2" type="button">Add to basket
+                                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-primary btn-sm"
+                                   type="button">Details</a>
+                                <button class="btn btn-outline-primary btn-sm mt-2" type="button"
+                                        value="{{ product.id }}" id="add-to-card-button">Add to
+                                    basket
                                 </button>
                             </div>
                         </div>
@@ -36,5 +48,26 @@
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).on('click', '#add-to-card-button', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '{% url "basket:basket_add" %}',
+                data: {
+                    productid: $('#add-to-card-button').val(),
+                    productqty: $('#select-qty option:selected').text(),
+                    csrfmiddlewaretoken: "{{csrf_token}}",
+                    action: 'post'
+                },
+                success: function (json) {
+                    document.getElementById("basket-qty").innerHTML = json.qty
+                },
+                error: function (xhr, errmsg, err) {
+                }
+            });
+        })
+    </script>
 
 {% endblock %}
